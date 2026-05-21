@@ -1,6 +1,6 @@
 module.exports = {
   default: {
-    require: ['src/step-definitions/*.ts'],
+    require: ['src/fixtures/*.ts', 'src/step-definitions/*.ts'],
     requireModule: ['ts-node/register'],
     format: [
       'progress',

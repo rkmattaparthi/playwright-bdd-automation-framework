@@ -2,11 +2,14 @@ import { When, Then } from '@cucumber/cucumber';
 
 import { expect } from '@playwright/test';
 
-import { ProductsPage } from '../pages/ProductsPage';
+import { getWorldPage } from '../fixtures/world';
+import { ProductsPage } from '../pages/ProductPage';
 
 let productsPage: ProductsPage;
 
 When('the user searches for {string}', async function (product: string) {
+
+  const page = getWorldPage();
 
   productsPage = new ProductsPage(page);
 
@@ -14,6 +17,8 @@ When('the user searches for {string}', async function (product: string) {
 });
 
 Then('matching products should be displayed', async function () {
+
+  const page = getWorldPage();
 
   await expect(
     page.locator('.features_items')

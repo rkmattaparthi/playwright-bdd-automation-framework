@@ -1,24 +1,18 @@
 import { Given, When, Then } from '@cucumber/cucumber';
 
-import { chromium, Browser, Page, expect } from '@playwright/test';
+import { expect } from '@playwright/test';
 
 import dotenv from 'dotenv';
 
 import { LoginPage } from '../pages/LoginPage';
+import { getWorldPage } from '../fixtures/world';
 
 dotenv.config();
-
-let browser: Browser;
-
-let page: Page;
 
 let loginPage: LoginPage;
 
 Given('the user navigates to the application', async function () {
-
-  browser = await chromium.launch();
-
-  page = await browser.newPage();
+  const page = getWorldPage();
 
   loginPage = new LoginPage(page);
 
@@ -29,17 +23,25 @@ When('the user logs in with valid credentials', async function () {
 
   await loginPage.openLoginPage();
 
-  await loginPage.login(
-    process.env.EMAIL!,
-    process.env.PASSWORD!
-  );
+const email = process.env.EMAIL;
+const password = process.env.PASSWORD;
+
+if (!email || !password) {
+  throw new Error('EMAIL or PASSWORD missing in .env');
+}
+
+await loginPage.login(email, password);
 });
 
 Then('the user should successfully login', async function () {
 
-  await expect(
-    page.locator('a[href=\"/logout\"]')
-  ).toBeVisible();
+  const page = getWorldPage();
 
-  await browser.close();
+  console.log('Post-login URL:', page.url());
+  await page.screenshot({ path: 'screenshots/post-login.png', fullPage: true });
+
+  // Prefer a text-based selector as the site may change hrefs; increase timeout
+  await expect(
+    page.locator('a:has-text("Logout")')
+  ).toBeVisible({ timeout: 10000 });
 });
